@@ -1,29 +1,3 @@
-
-# coding: utf-8
-
-# # Self-Driving Car Engineer Nanodegree
-#
-# ## Deep Learning
-#
-# ## Project: Build a Traffic Sign Recognition Classifier
-#
-# In this notebook, a template is provided for you to implement your functionality in stages, which is required to successfully complete this project. If additional code is required that cannot be included in the notebook, be sure that the Python code is successfully imported and included in your submission if necessary.
-#
-# > **Note**: Once you have completed all of the code implementations, you need to finalize your work by exporting the iPython Notebook as an HTML document. Before exporting the notebook to html, all of the code cells need to have been run so that reviewers can see the final implementation and output. You can then export the notebook by using the menu above and navigating to  \n",
-#     "**File -> Download as -> HTML (.html)**. Include the finished document along with this notebook as your submission.
-#
-# In addition to implementing code, there is a writeup to complete. The writeup should be completed in a separate file, which can be either a markdown file or a pdf document. There is a [write up template](https://github.com/udacity/CarND-Traffic-Sign-Classifier-Project/blob/master/writeup_template.md) that can be used to guide the writing process. Completing the code template and writeup template will cover all of the [rubric points](https://review.udacity.com/#!/rubrics/481/view) for this project.
-#
-# The [rubric](https://review.udacity.com/#!/rubrics/481/view) contains "Stand Out Suggestions" for enhancing the project beyond the minimum requirements. The stand out suggestions are optional. If you decide to pursue the "stand out suggestions", you can include the code in this Ipython notebook and also discuss the results in the writeup file.
-#
-#
-# >**Note:** Code and Markdown cells can be executed using the **Shift + Enter** keyboard shortcut. In addition, Markdown cells can be edited by typically double-clicking the cell to enter edit mode.
-
-# ---
-# ## Step 0: Load The Data
-
-# In[1]:
-
 # Load pickled data
 import pickle
 
@@ -337,7 +311,7 @@ if USE_EXTENDED_TRAINING_DATA:
         plt.imshow(X_train_lighting[random_train])
     plt.show()
     """
-from keras.applications.resnet50 import *
+from keras.applications.inception_v3 import *
 import numpy as np
 import keras
 import cv2
@@ -353,12 +327,39 @@ def scale_image(X_train, scale):
         X_train_aug.append(img)
     return np.asarray(X_train_aug)
 
-X_train = scale_image(X_train, 7.0)
-
-model = ResNet50(weights=None, input_shape=(224, 224, 3), classes=43)
+model = InceptionV3(weights=None, input_shape=(299, 299, 3), classes=43)
 model.compile(optimizer = 'adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-one_hot_labels = keras.utils.np_utils.to_categorical(y_train, nb_classes=43)
 
-model.fit(X_train, one_hot_labels, nb_epoch=10, batch_size=128)
+from sklearn.utils import shuffle
+
+train_accuracies = []
+validation_accuracies = []
+
+for i in range(EPOCHS):
+    num_examples = len(X_train)
+
+    print("Training...")
+    print()
+
+    X_train, y_train = shuffle(X_train, y_train)
+    for offset in range(0, num_examples, BATCH_SIZE):
+        print("batch {}".format(offset))
+        end = offset + BATCH_SIZE
+        batch_x, batch_y = X_train[offset:end], y_train[offset:end]
+        batch_x = scale_image(batch_x, 9.34375)
+        one_hot_labels = keras.utils.np_utils.to_categorical(batch_y, nb_classes=43)
+
+        print(batch_x.shape)
+        print(one_hot_labels.shape)
+        model.train_on_batch(batch_x, one_hot_labels)
+
+    print("EPOCH {} ...".format(i+1))
+
+	#train_accuracy = model.predict(
+	#train_accuracies.append(train_accuracy)
+	#validation_accuracy = evaluate(X_validation, y_validation, accuracy_operation, tensors['dropout_keep_prob'])
+	#validation_accuracies.append(validation_accuracy)
+	#print("Validation Accuracy = {:.3f}".format(validation_accuracy))
+	#print()
 
