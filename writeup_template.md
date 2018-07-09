@@ -332,7 +332,8 @@ Feature map of Speed Limit 30km suggest that the model is not capturing key feat
 
 
 ## References
-[1] https://en.wikipedia.org/wiki/Training,_test,_and_validation_sets
-[2] https://en.wikipedia.org/wiki/Road_signs_in_Germany
-[3] http://yann.lecun.com/exdb/publis/pdf/sermanet-ijcnn-11.pdf
-[4] https://en.wikipedia.org/wiki/Feature_scaling
+
+1. https://en.wikipedia.org/wiki/Training,_test,_and_validation_sets
+2. https://en.wikipedia.org/wiki/Road_signs_in_Germany
+3. http://yann.lecun.com/exdb/publis/pdf/sermanet-ijcnn-11.pdf
+4. https://en.wikipedia.org/wiki/Feature_scaling
