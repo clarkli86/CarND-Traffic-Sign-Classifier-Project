@@ -1,4 +1,4 @@
-# **Traffic Sign Recognition** 
+# **Traffic Sign Recognition**
 
 ## Writeup
 
@@ -24,7 +24,11 @@ The goals / steps of this project are the following:
 [augmentation]: ./res/augmentation.png "Augmentation"
 [download]: ./res/download.png "Download"
 [feature_map_70_km]: ./res/feature_map_70_km.png "Feautre Map 70 km/h"
-[feature_map_no_entry]: ./res/feature_map_no_entry.png "Feautre Map No Entry"
+[feature_map_30_km]: ./res/feature_map_30_km.png "Feautre Map 30 km/h"
+[feature_map_turn_left_ahead]: ./res/feature_map_turn_left_ahead.png "Feautre Map Turn Left Ahead"
+[precision]: ./res/precision.png "Precision"
+[recall]: ./res/recall.png "Recall"
+[most_uncertain]: ./res/most_uncertain.png "Most Uncertain"
 
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.
@@ -69,7 +73,7 @@ As a first step, I decided to convert the images to grayscale because
 
 Here is an example of a traffic sign image before and after grayscaling.
 
-![alt text][before_after_grayscale]
+![alt text][before_after_greyscale]
 
 As a last step, I normalized the image data because it speeds up the training process as the parameters will be in equal range. (equal variance) This makes it more likely for gradient descent to optimise on all parameters and coverge faster. [4] When training on large dataset or very deep neural networks, this could save the researcher a couple of epochs or days.
 
@@ -130,7 +134,7 @@ A table of all hyperparameters
 My final model results were:
 * training set accuracy of 0.999
 * validation set accuracy of 0.984
-* test set accuracy of 0.973
+* test set accuracy of 0.970
 
 An iterative approach was chosen for this project:
 1. Firstly the orinal LeNet5 model was used. Two convolutional layers and 2 hidden layers should be a good start for low resolution image (32x32x3) classification. Prolbem with this model was that validation accuracy (90%) was much lower than training accuracy.
@@ -139,6 +143,18 @@ An iterative approach was chosen for this project:
 4. Then I tried batch normlisation to further reduce overfit to traning data but it didn't seem to help.
 5. Also tried the multiple-scale architecture which connects output to from multiple convolution layers to fully-connected layers[3], but it didn't seem to help either.
 6. The next step would be to try inception model which employs convlution layers with different kernal size. Hopefully this model will capture more unique features of each different traffic sign.
+
+#### 5. Futher Improvement
+##### 1. Precision/Recall
+
+Attention shall be paied to classes with low precision/recall rate. They may suggest that there are not enough samples in this class and an overfit has happended.
+![alt text][precision]
+![alt text][recall]
+
+##### 2. Most Uncertain Predictions
+
+Most uncertain (biggest cross-entropy) predicatoions in validation data set suggest that brightness and resolution caused  a lot of errors. More augmented images with extra brighness or gaussian noise should be considered.
+![alt text][most_uncertain]
 
 ### Test a Model on New Images
 
@@ -161,14 +177,14 @@ Here are the results of the prediction:
 | 30 km/h	      		| 30 km/h  		         		 				|
 | Priority Road			| Priority Road      							|
 | Keep Right      		| Keep Right             		 				|
-| No entry	      		| No entry 		         		 				|
+| No entry	      		| Stop      	         		 				|
 | Yield					| Yield											|
-| Turn left ahead  		| Turn left ahead       		 				|
+| Turn left ahead  		| Speed Limit 30 km/h      		 				|
 | Turn right ahead 		| Turn right ahead       		 				|
 | Road work      		| Road work 									|
 | Stop Sign      		| Stop sign   									|
 
-The model was able to correctly guess 9 of the 10 traffic signs, which gives an accuracy of 90%. This compares less favorably to the accuracy on the test set of 97.3%.
+The model was able to correctly guess 9 of the 10 traffic signs, which gives an accuracy of 90%. This compares less favorably to the accuracy on the test set of 97.0%.
 
 #### 3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction. Provide the top 5 softmax probabilities for each image along with the sign type of each probability. (OPTIONAL: as described in the "Stand Out Suggestions" part of the rubric, visualizations can also be provided such as bar charts)
 
@@ -213,90 +229,90 @@ For the second image, the model is relatively sure that this is a 30 km/h speed 
 | Probability | Prediction |
 |:-----------:|:----------:|
 | 1.0 | Speed limit (30km/h) |
-| 1.084540512952259e-10 | Speed limit (70km/h) |
-| 3.4022345487758066e-14 | Speed limit (20km/h) |
-| 1.4816447697105044e-14 | Speed limit (50km/h) |
-| 1.0803471561359607e-14 | Keep right |
+| 2.7314572478842614e-11 | Speed limit (70km/h) |
+| 2.0620283258665495e-11 | Speed limit (20km/h) |
+| 3.139686861192148e-15 | Speed limit (80km/h) |
+| 7.654304166032078e-20 | Speed limit (50km/h) |
 
 For the third image, the model is relatively sure that this is a priority road sign (probability of 1.0). The top five soft max probabilities were
 
 | Probability | Prediction |
 |:-----------:|:----------:|
 | 1.0 | Priority road |
-| 4.436801690668137e-36 | Yield |
-| 4.747134190250079e-37 | Keep right |
-| 3.251670935407931e-37 | Ahead only |
-| 0.0 | Speed limit (20km/h) |
+| 2.284483742585389e-25 | Keep right |
+| 1.021200625554417e-26 | Yield |
+| 1.2434302330770125e-35 | No passing for vehicles over 3.5 metric tons |
+| 6.852475046890759e-38 | No passing |
 
-For the fourth image, the model is relatively sure that this is a keep right sign (probability of 1.0). The top five soft max probabilities were
-
-| Probability | Prediction |
-|:-----------:|:----------:|
-| 1.0 | Keep right |
-| 2.748486117518101e-13 | Priority road |
-| 2.1430158558660413e-16 | No vehicles |
-| 7.787736060597305e-17 | Speed limit (30km/h) |
-| 1.9676588599607198e-17 | Yield |
-
-For the fifth image, the model is relatively sure that this is a priority road sign (probability of 0.96). and does not contain a no entry sign. The top five soft max probabilities were
+For the fourth image, the model is relatively sure that this is a keep right sign (probability of 0.99). The top five soft max probabilities were
 
 | Probability | Prediction |
 |:-----------:|:----------:|
-| 0.9604279398918152 | Priority road |
-| 0.030626516789197922 | Roundabout mandatory |
-| 0.006541649345308542 | No entry |
-| 0.0012478885473683476 | Keep right |
-| 0.0011183376191183925 | End of all speed and passing limits |
+| 0.999893307685852 | Keep right |
+| 7.086289406288415e-05 | Yield |
+| 2.33541322813835e-05 | Priority road |
+| 1.0860970178327989e-05 | No passing for vehicles over 3.5 metric tons |
+| 4.859626869802014e-07 | No entry |
+
+For the fifth image, the model is relatively sure that this is a stop sign (probability of 1.0). and does not contain a no entry sign. The top five soft max probabilities were
+
+| Probability | Prediction |
+|:-----------:|:----------:|
+| 1.0 | No entry |
+| 6.805907400153632e-12 | End of no passing by vehicles over 3.5 metric tons |
+| 2.559892673271308e-13 | Keep right |
+| 2.6836498545743695e-17 | Stop |
+| 5.032354558623227e-20 | End of no passing |
 
 For the sixth image, the model is relatively sure that this is a yield sign (probability of 1.0). The top five soft max probabilities were
 
 | Probability | Prediction |
 |:-----------:|:----------:|
 | 1.0 | Yield |
-| 0.0 | Speed limit (20km/h) |
-| 0.0 | Speed limit (30km/h) |
-| 0.0 | Speed limit (50km/h) |
-| 0.0 | Speed limit (60km/h) |
+| 6.285845145073205e-27 | Speed limit (50km/h) |
+| 1.1231227915043077e-35 | No passing for vehicles over 3.5 metric tons |
+| 3.082709541227782e-37 | Speed limit (30km/h) |
+| 9.91041153703519e-39 | Road work |
 
-For the seventh image, the model is relatively sure that this is a turn left ahead sign (probability of 0.99). The top five soft max probabilities were
-
-| Probability | Prediction |
-|:-----------:|:----------:|
-| 0.9999880790710449 | Turn left ahead |
-| 4.950617494614562e-06 | Keep right |
-| 4.766291567648295e-06 | Ahead only |
-| 1.596443780726986e-06 | Go straight or right |
-| 2.9755901209682634e-07 | Yield |
-
-For the eighth image, the model is relatively sure that this is a turn right ahead sign (probability of 0.99). The top five soft max probabilities were
+For the seventh image, the model is relatively sure that this is a turn left ahead sign (probability of 0.7), and not very sure that this is a Turn left ahead sign (probability of 0.04). The top five soft max probabilities were
 
 | Probability | Prediction |
 |:-----------:|:----------:|
-| 0.9999984502792358 | Turn right ahead |
-| 1.273617840524821e-06 | Yield |
-| 1.9208975743367773e-07 | Ahead only |
-| 4.7405013248180694e-08 | Speed limit (60km/h) |
-| 1.0132477079594082e-08 | Stop |
+| 0.7084112763404846 | Speed limit (30km/h) |
+| 0.20500679314136505 | Keep right |
+| 0.04701860621571541 | Turn left ahead |
+| 0.031798698008060455 | Speed limit (20km/h) |
+| 0.007393065374344587 | No entry |
+
+For the eighth image, the model is relatively sure that this is a turn right ahead sign (probability of 1.0). The top five soft max probabilities were
+
+| Probability | Prediction |
+|:-----------:|:----------:|
+| 1.0 | Turn right ahead |
+| 2.794764424331241e-23 | Ahead only |
+| 1.9500441280349196e-27 | Priority road |
+| 3.5512128355471453e-28 | Go straight or right |
+| 2.2639284829560083e-28 | No entry |
 
 For the ninth image, the model is relatively sure that this is a road work sign (probability of 1.0). The top five soft max probabilities were
 
 | Probability | Prediction |
 |:-----------:|:----------:|
 | 1.0 | Road work |
-| 3.5238897348336716e-26 | Keep right |
-| 3.921407776942002e-31 | Bumpy road |
-| 7.929453407308172e-36 | Traffic signals |
+| 3.7641682151290165e-38 | Wild animals crossing |
+| 2.1639561344425238e-38 | General caution |
 | 0.0 | Speed limit (20km/h) |
+| 0.0 | Speed limit (30km/h) |
 
 For the tenth image, the model is relatively sure that this is a stop sign (probability of 1.0). The top five soft max probabilities were
 
 | Probability | Prediction |
 |:-----------:|:----------:|
 | 1.0 | Stop |
-| 1.1558399426405063e-18 | Priority road |
-| 3.478716467144854e-20 | Keep right |
-| 1.7820014944128097e-20 | No vehicles |
-| 5.318853329763013e-21 | No entry |
+| 6.922977816015141e-13 | Speed limit (30km/h) |
+| 9.288086843557827e-16 | Keep right |
+| 1.7490519647218996e-16 | Yield |
+| 6.569674889177039e-17 | Speed limit (50km/h) |
 
 ### (Optional) Visualizing the Neural Network (See Step 4 of the Ipython notebook for more details)
 #### 1. Discuss the visual output of your trained network's feature maps. What characteristics did the neural network use to make classifications?
@@ -307,9 +323,13 @@ I've visuallised the feature map of two downloaded imges in the first convolutio
 ![alt text][feature_map_70_km]
 The feature map shows that digits and circular boundary around it have been emphasised for activitation.
 
-1. Unsuccessful prediction on No Entry
-![alt text][feature_map_no_entry]
-The feature map shows that even the horizantal bar is found but the feature of cicular boundary is lost. The broken up segments of the boundary may make the model believe it is a priority road sign.
+1. Unsuccessful prediction on Turn Left Ahead
+2.1 Feature Map of Turn Left Ahead
+![alt text][feature_map_turn_left_ahead]
+2.2 Feature Map of Speed Limit 30km
+![alt text][feature_map_30_km]
+Feature map of Speed Limit 30km suggest that the model is not capturing key features of digit `3`. Downloading more images of Speed Limit 30km shall be considered to prevent overfitting to training/validation/testing data set.
+
 
 ## References
 [1] https://en.wikipedia.org/wiki/Training,_test,_and_validation_sets
