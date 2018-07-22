@@ -147,7 +147,7 @@ rate = 0.001
 # L2 regularisation
 beta = 0.00
 EPOCHS = 30
-BATCH_SIZE = 128
+BATCH_SIZE = 32
 USE_DROPOUT = True
 DROPOUT_RATE = 0.5
 USE_BATCH_NORM = False
@@ -336,6 +336,8 @@ from sklearn.utils import shuffle
 train_accuracies = []
 validation_accuracies = []
 
+X_validation = scale_image(X_validation, 9.34375)
+y_validation = keras.utils.np_utils.to_categorical(y_validation, num_classes=43)
 for i in range(EPOCHS):
     num_examples = len(X_train)
 
@@ -348,18 +350,12 @@ for i in range(EPOCHS):
         end = offset + BATCH_SIZE
         batch_x, batch_y = X_train[offset:end], y_train[offset:end]
         batch_x = scale_image(batch_x, 9.34375)
-        one_hot_labels = keras.utils.np_utils.to_categorical(batch_y, nb_classes=43)
+        one_hot_labels = keras.utils.np_utils.to_categorical(batch_y, num_classes=43)
 
         print(batch_x.shape)
         print(one_hot_labels.shape)
         model.train_on_batch(batch_x, one_hot_labels)
 
     print("EPOCH {} ...".format(i+1))
-
-	#train_accuracy = model.predict(
-	#train_accuracies.append(train_accuracy)
-	#validation_accuracy = evaluate(X_validation, y_validation, accuracy_operation, tensors['dropout_keep_prob'])
-	#validation_accuracies.append(validation_accuracy)
-	#print("Validation Accuracy = {:.3f}".format(validation_accuracy))
-	#print()
+    print(model.evaluate(X_validation, y_validation))
 
