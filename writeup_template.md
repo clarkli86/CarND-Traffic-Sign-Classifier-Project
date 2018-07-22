@@ -29,6 +29,7 @@ The goals / steps of this project are the following:
 [precision]: ./res/precision.png "Precision"
 [recall]: ./res/recall.png "Recall"
 [most_uncertain]: ./res/most_uncertain.png "Most Uncertain"
+[train_val_accuracies]: ./res/train_val_accuracies.png "Train/Validation Accuracies"
 
 ## Rubric Points
 ### Here I will consider the [rubric points](https://review.udacity.com/#!/rubrics/481/view) individually and describe how I addressed each point in my implementation.
@@ -330,6 +331,57 @@ The feature map shows that digits and circular boundary around it have been emph
 ![alt text][feature_map_30_km]
 Feature map of Speed Limit 30km suggest that the model is not capturing key features of digit `3`. Downloading more images of Speed Limit 30km shall be considered to prevent overfitting to training/validation/testing data set.
 
+## Improvement with Multi-Scale CNN
+A new version of Traffic Classification implementation has been done in Keras [5]. The multi-scale network architecture is based on the paper by Pierre Sermanent and Yann Lecun [6].
+
+### Summary of Network
+```
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+input_1 (InputLayer)             (None, 32, 32, 1)     0                                            
+____________________________________________________________________________________________________
+convolution2d_1 (Convolution2D)  (None, 30, 30, 12)    120         input_1[0][0]                    
+____________________________________________________________________________________________________
+convolution2d_2 (Convolution2D)  (None, 28, 28, 24)    2616        convolution2d_1[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_1 (MaxPooling2D)    (None, 14, 14, 24)    0           convolution2d_2[0][0]            
+____________________________________________________________________________________________________
+convolution2d_3 (Convolution2D)  (None, 10, 10, 36)    21636       maxpooling2d_1[0][0]             
+____________________________________________________________________________________________________
+convolution2d_4 (Convolution2D)  (None, 6, 6, 48)      43248       convolution2d_3[0][0]            
+____________________________________________________________________________________________________
+maxpooling2d_2 (MaxPooling2D)    (None, 3, 3, 48)      0           convolution2d_4[0][0]            
+____________________________________________________________________________________________________
+flatten_1 (Flatten)              (None, 4704)          0           maxpooling2d_1[0][0]             
+____________________________________________________________________________________________________
+flatten_2 (Flatten)              (None, 432)           0           maxpooling2d_2[0][0]             
+____________________________________________________________________________________________________
+merge_1 (Merge)                  (None, 5136)          0           flatten_1[0][0]                  
+                                                                   flatten_2[0][0]                  
+____________________________________________________________________________________________________
+dense_1 (Dense)                  (None, 512)           2630144     merge_1[0][0]                    
+____________________________________________________________________________________________________
+dropout_1 (Dropout)              (None, 512)           0           dense_1[0][0]                    
+____________________________________________________________________________________________________
+dense_2 (Dense)                  (None, 256)           131328      dropout_1[0][0]                  
+____________________________________________________________________________________________________
+dropout_2 (Dropout)              (None, 256)           0           dense_2[0][0]                    
+____________________________________________________________________________________________________
+dense_3 (Dense)                  (None, 43)            11051       dropout_2[0][0]                  
+====================================================================================================
+Total params: 2,840,143
+Trainable params: 2,840,143
+Non-trainable params: 0
+```
+Note that **merge_1** connects flattened first stage convolutionary layer (**maxpooling2d_1**) and second stage convolutionary layer (**maxpolling2d_2**) to hidden layers.
+
+### Performance
+Results of this new model were:
+* training set accuracy of 0.995
+* validation set accuracy of 0.993
+* test set accuracy of 0.978
+
+![alt txt][train_val_accuracies]
 
 ## References
 
@@ -337,3 +389,5 @@ Feature map of Speed Limit 30km suggest that the model is not capturing key feat
 2. https://en.wikipedia.org/wiki/Road_signs_in_Germany
 3. http://yann.lecun.com/exdb/publis/pdf/sermanet-ijcnn-11.pdf
 4. https://en.wikipedia.org/wiki/Feature_scaling
+5. https://faroit.github.io/keras-docs/1.2.1/
+6. http://yann.lecun.com/exdb/publis/pdf/sermanet-ijcnn-11.pdf
